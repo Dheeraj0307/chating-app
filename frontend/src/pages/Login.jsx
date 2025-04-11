@@ -1,72 +1,74 @@
-import axios from 'axios';
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Button, TextField } from "@mui/material";
+import axios from "axios";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
 
 const Login = () => {
+  const { handleSubmit, register } = useForm();
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-    const [value, setValue] = useState({
-        email: '',
-        password: ''
-    })
+  const login = async (data) => {
+    setError("");
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/api/user/login",
+        data
+      );
 
-    const [token, setToken] = useState(null)
-    const { email, password } = value
-    const navigate = useNavigate();
+      const storeToken = res.data.token;
 
-
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-
-        setValue((prev) => ({ ...prev, [name]: value }))
+      if (storeToken) {
+        localStorage.setItem("token", storeToken);
+      }
+      navigate("/chat");
+    } catch (error) {
+      setError(error.message);
     }
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const res = await axios.post('http://localhost:3000/api/auth/login', value)
+  return (
+    <div className="flex flex-col">
+      <h2 className="text-3xl">Login</h2>
 
-            const storeToken = res.data.token;
+      <form onSubmit={handleSubmit(login)} className="flex flex-col">
+        <TextField
+          id="email-helper-text-aligned"
+          label="Email"
+          type="email"
+          {...register("email", {
+            required: true,
+            validate: {
+              matchPattern: (val) =>
+                /^([\w\.\-_]+)?\w+@[\w-_]+(\.\w+){1,}$/.test(val) ||
+                "Email must be validate",
+            },
+          })}
+        />
 
-            if (storeToken) {
-                setToken(storeToken)
-                localStorage.setItem("token", storeToken)
-            }
-            navigate('/chat')
+        <TextField
+          id="password-helper-text-aligned"
+          label="Password"
+          type="password"
+          {...register("password", {
+            required: true,
+          })}
+        />
 
-        } catch (error) {
-            console.log(error.response.data.message)
-        }
-        setValue({
-            email: '',
-            password: ''
-        })
-    }
-    return (<>
-        <h2>Login</h2>
+        <Button variant="contained" type="submit" color="success">
+          submit
+        </Button>
+      </form>
 
-        <form onSubmit={handleSubmit}>
+      <h2>OR</h2>
 
-            <input
-                type="email"
-                name='email'
-                value={email}
-                placeholder='email'
-                onChange={handleChange} />
+      <Button variant="contained" type="button" color="success">
+        <Link to={"/signup"}>SignUp</Link>
+      </Button>
 
-            <input
-                type="password"
-                name='password'
-                value={password}
-                placeholder='password'
-                onChange={handleChange} />
-
-            <button type="submit">
-                submit
-            </button>
-
-        </form>
-    </>
-    )
-}
-export default Login
+      {error && <p className="text-red-600 mt-8 text-center">{error} </p>}
+    </div>
+  );
+};
+export default Login;

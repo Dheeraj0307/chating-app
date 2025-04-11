@@ -1,14 +1,32 @@
- body{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: calc(100vh - 100px);
-    margin: 0;
- }
+@import "tailwindcss"; 
  
- .flex {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
- }
+@layer utilities {         /* here comes the css that needs to overwrite on previous defined css */
+
+}
+
+@layer components {        /* for normal css under a classname */
+ 
+   .item{
+      /* @apply   for tailwind-css   */  
+   }
+
+   .app-layout {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 60px);
+    }
+      
+    .app-content {
+      flex: 1; /* Fills remaining space */  
+    }
+
+   .flex {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+   }
+}
+
+
+ 

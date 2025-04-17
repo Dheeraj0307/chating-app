@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, forwardRef } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
@@ -9,6 +9,8 @@ const Chat = () => {
   const [msg, setMsg] = useState("");
   const [recentChat, setRecentChat] = useState([]);
   const socketRef = useRef();
+  const inputRef = useRef(null);
+  const lastMsg = useRef();
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e) => {
@@ -18,14 +20,14 @@ const Chat = () => {
     if (!msg.trim()) return;
 
     console.log("Submitted:", msg);
-    socketRef.current.emit("send-message",  {
-        user: socketRef.current.id,
-        text: msg,
-        timestamp: Date.now(), // optional
-      });
+    socketRef.current.emit("send-message", {
+      user: socketRef.current.id,
+      text: msg,
+      timestamp: Date.now(), // optional
+    });
     setMsg(""); // clear input
-    setSubmitted(false);    
-  }; 
+    setSubmitted(false);
+  };
 
   useEffect(() => {
     const socket = io("http://localhost:3000", {
@@ -37,9 +39,9 @@ const Chat = () => {
       console.log("🔌 Connected with socket ID:", socket.id);
     });
 
-    socket.on("chat_history",(prevData)=>{
-        setRecentChat(prevData)
-    })
+    socket.on("chat_history", (prevData) => {
+      setRecentChat(prevData);
+    });
 
     socket.on("disconnect", (reason) => {
       console.log(`socket ${socket.id} ⚠️ disconnected due to ${reason}`);
@@ -55,13 +57,35 @@ const Chat = () => {
     socketRef.current = socket;
 
     return () => {
-      socket.disconnect(); 
+      socket.disconnect();
     };
   }, []);
 
+  useEffect(() => {
+    if (lastMsg.current) {
+      lastMsg.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [recentChat]);
+
+  useEffect(() => {
+    function fireEnter(e) {
+      if (e.key === "Enter" && msg.length !== 0) {
+        handleSubmit(e);
+      }
+    }
+
+    const input = inputRef.current;
+
+    if (input) input.addEventListener("keydown", fireEnter);
+
+    return () => {
+      if (input) input.removeEventListener("keydown", fireEnter);
+    };
+  }, [msg]);
+
   return (
     <div>
-      <h2 className="text-5xl text-center my-5 capitalize">chatting app</h2>
+      <h2 className="heading">chatting app</h2>
       <ThemeProvider
         theme={{
           palette: {
@@ -88,15 +112,21 @@ const Chat = () => {
           }}
         >
           {recentChat.map((data, i) => {
-            return <p key={data.id || i}>{data.text || data}</p>
+            const last = i === recentChat.length - 1;
+            return (
+              <p ref={last ? lastMsg : null} key={data.id || i}>
+                {data.text || data}
+              </p>
+            );
           })}
         </Box>
       </ThemeProvider>
 
       <div className="flex">
-        <TextField
-          id="standard-basic"
+        <TextField 
           label="text"
+          ref={inputRef}
+          autoFocus
           type="text"
           value={msg}
           onChange={(e) => setMsg(e.target.value)}

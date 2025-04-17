@@ -39,7 +39,7 @@ const Signup = () => {
             required:true
           })}
         />
-{errors.fullname && <span className="text-red-600 text-center">This field is required</span>}
+{errors.fullname && <span className="error">This field is required</span>}
         <TextField
           id="email-helper-text-aligned"
           label="Email"
@@ -48,7 +48,7 @@ const Signup = () => {
             required:true
           })}
         />
-{errors.email && <span className="text-red-600 text-center">This field is required</span>}
+{errors.email && <span className="error">This field is required</span>}
         <TextField
           id="password-helper-text-aligned"
           label="Password"
@@ -57,7 +57,7 @@ const Signup = () => {
             required:true
           })}
         />
-        {errors.password && <span className="text-red-600 text-center">This field is required</span>}
+        {errors.password && <span className="error">This field is required</span>}
         <TextField
           id="confirmPassword-helper-text-aligned"
           label="Confirm Password"
@@ -66,7 +66,7 @@ const Signup = () => {
             required:true
           })}
         />
-{errors.confirmPassword && <span className="text-red-600 text-center">This field is required</span>}
+{errors.confirmPassword && <span className="error">This field is required</span>}
         <Button variant="contained" type="submit" color="success">
           submit
         </Button>
@@ -80,7 +80,7 @@ Login
  </Link>
 </Button> 
 
-{error && <p className="text-red-600 text-center">{error} </p>}
+{error && <p className="error">{error} </p>}
     </div>
   );
 };

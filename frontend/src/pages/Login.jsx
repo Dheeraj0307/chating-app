@@ -30,7 +30,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-col">
-      <h2 className="text-3xl">Login</h2>
+      <h2 className="heading">Login</h2>
 
       <form onSubmit={handleSubmit(login)} className="flex flex-col">
         <TextField
@@ -67,7 +67,7 @@ const Login = () => {
         <Link to={"/signup"}>SignUp</Link>
       </Button>
 
-      {error && <p className="text-red-600 mt-8 text-center">{error} </p>}
+      {error && <p className="error">{error} </p>}
     </div>
   );
 };
